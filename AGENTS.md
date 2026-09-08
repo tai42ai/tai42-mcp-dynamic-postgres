@@ -32,13 +32,14 @@ uv run pytest -m integration
 ## Comments and docs
 
 Terse, constraint-only, present tense. State the constraint and why it holds, not
-what changed. No history notes, no plan/ticket/mission references.
+what changed. No history notes and no ticket references in comments.
 
 ## Rules
 
-- No `CHANGELOG.md` edits: notes are generated onto the GitHub Release. Do not add
-  or maintain a changelog file.
-- Loud errors: a failure fails the run. No silent fallbacks, no `|| true`, no
+- Release notes are generated onto the GitHub Release from commit messages;
+  release-please is configured with `skip-changelog`, so `CHANGELOG.md` stays the
+  empty stub.
+- Loud errors: a failure is fatal. No silent fallbacks, no `|| true`, no
   swallowed exceptions, no compatibility shims.
 - The workflows under `.github/workflows/` are the source of truth for commands;
   keep this file in step with them.
