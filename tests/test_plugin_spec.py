@@ -41,8 +41,8 @@ def test_spec_is_a_contract_less_mcp_server() -> None:
 
 
 def test_spec_version_matches_the_package_version() -> None:
-    # The fleet invariant: the spec version equals the built wheel's version, so a
-    # seeded listing always resolves to the wheel that carries these docs.
+    # The spec version equals the built wheel's version, so a listing always
+    # resolves to the wheel that carries these docs.
     assert _spec().version == _pyproject()["project"]["version"]
 
 

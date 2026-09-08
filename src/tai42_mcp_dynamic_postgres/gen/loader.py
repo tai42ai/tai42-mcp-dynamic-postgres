@@ -96,19 +96,19 @@ async def load_dynamic_tools(
         for gen in to_generate:
             gen.generate_file(tables, fks)
 
-    # Prune previously-generated tool files not part of this run, so a later
+    # Prune previously-generated tool files not part of this load, so a later
     # --readonly run never serves stale write tools.
     expected = {f"{gen.module_name}.py" for gen in gen_list}
     for path in OUTPUT_DIR.glob(f"*{TOOLS_SUFFIX}.py"):
         if path.name not in expected:
             path.unlink()
 
-    # Make the writable output dir importable, then import exactly this run's
+    # Make the writable output dir importable, then import exactly this load's
     # modules (never a blanket walk of whatever files happen to be on disk).
     if str(OUTPUT_DIR) not in tools.__path__:
         tools.__path__.append(str(OUTPUT_DIR))
 
-    # Deregister tools of any module this run no longer generates, so the app
+    # Deregister tools of any module this load no longer generates, so the app
     # stops serving a tool whose generated file was just pruned.
     expected_modules = {gen.module_name for gen in gen_list}
     for stale_module in [name for name in _registered_tools if name not in expected_modules]:

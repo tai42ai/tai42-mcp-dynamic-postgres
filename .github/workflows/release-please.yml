@@ -30,8 +30,8 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
   # release-please bumps [project].version in pyproject.toml but not uv.lock,
-  # whose own editable entry still pins the old version, so CI's `uv sync --locked`
-  # rejects the release PR fleet-wide. Refresh the lockfile on the release branch
+  # whose own editable entry still pins the pre-bump version, so CI's
+  # `uv sync --locked` rejects the release PR. Refresh the lockfile on the release branch
   # so the PR carries a coherent pyproject.toml + uv.lock pair. Push with the PAT
   # (not GITHUB_TOKEN) so CI re-fires on the release PR.
   sync-lock:
