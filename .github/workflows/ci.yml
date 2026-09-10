@@ -13,6 +13,71 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Classify the push/PR as a version-only bump (a release-please train branch, or
+  # a diff that only touches CHANGELOG.md, .release-please-manifest.json, and the
+  # version fields of package manifests). The heavy Docker/testcontainers
+  # integration lane gates on this output so a release train and the version-bump
+  # merge to main do not spin containers for a change that alters no shipped code.
+  # Fail-safe: any case it cannot classify leaves version_only=false, so the heavy
+  # lane runs.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      version_only: ${{ steps.classify.outputs.version_only }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - id: classify
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          emit() { echo "version_only=$1" >> "$GITHUB_OUTPUT"; echo "version_only=$1"; }
+
+          # A release-please train branch only ever carries version + changelog bumps.
+          if [[ "${HEAD_REF}" == release-please--branches--* ]]; then
+            emit true; exit 0
+          fi
+
+          case "${EVENT_NAME}" in
+            pull_request) base="${PR_BASE_SHA}"; head="${PR_HEAD_SHA}" ;;
+            push) base="${PUSH_BEFORE}"; head="${GITHUB_SHA}" ;;
+            *) emit false; exit 0 ;;
+          esac
+
+          # No usable base (branch creation, force-push, first push) => run heavy.
+          if [[ -z "${base}" || "${base}" =~ ^0+$ ]]; then emit false; exit 0; fi
+          if ! git rev-parse -q --verify "${base}^{commit}" >/dev/null; then emit false; exit 0; fi
+
+          mapfile -t files < <(git diff --name-only "${base}" "${head}")
+          if [[ ${#files[@]} -eq 0 ]]; then emit false; exit 0; fi
+
+          version_only=true
+          for f in "${files[@]}"; do
+            [[ -z "${f}" ]] && continue
+            case "${f}" in
+              CHANGELOG.md|*/CHANGELOG.md|.release-please-manifest.json) continue ;;
+            esac
+            # Every added/removed content line in this file must be a version stamp.
+            while IFS= read -r line; do
+              content="${line:1}"
+              if printf '%s' "${content}" | grep -Eq '^[[:space:]]*version[[:space:]]*=[[:space:]]*"[^"]*"[[:space:]]*$'; then continue; fi
+              if printf '%s' "${content}" | grep -Eq '^[[:space:]]*(version|appVersion)[[:space:]]*:'; then continue; fi
+              if printf '%s' "${content}" | grep -Eq '^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"[^"]*",?[[:space:]]*$'; then continue; fi
+              case "${content}" in *x-release-please-version*) continue ;; esac
+              version_only=false; break
+            done < <(git diff --unified=0 "${base}" "${head}" -- "${f}" | grep -E '^[+-]' | grep -Ev '^(\+\+\+|---)' || true)
+            [[ "${version_only}" == false ]] && break
+          done
+
+          emit "${version_only}"
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +112,11 @@ jobs:
       - name: Unit tests
         run: uv run --python ${{ matrix.python-version }} pytest --cov --cov-report=term-missing
 
-  integration:
+  # Heavy Docker/testcontainers lane. Skipped for a version-only bump; the
+  # `integration` job below is the stable required status that reports the outcome.
+  integration-tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.version_only != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -59,3 +128,22 @@ jobs:
       - run: uv sync --locked --python 3.13 --extra dev --extra test-integration
       - name: Integration tests (Docker / testcontainers)
         run: uv run pytest -m integration
+
+  # Stable required status for branch protection: always runs and stays green when
+  # integration-tests passed or was skipped for a version-only bump; it fails only
+  # when integration-tests failed or was cancelled.
+  integration:
+    needs: [changes, integration-tests]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Integration tests passed or were skipped
+        env:
+          RESULT: ${{ needs.integration-tests.result }}
+        run: |
+          set -euo pipefail
+          echo "integration-tests result: ${RESULT}"
+          case "${RESULT}" in
+            success|skipped) ;;
+            *) echo "::error::integration-tests ${RESULT}"; exit 1 ;;
+          esac
