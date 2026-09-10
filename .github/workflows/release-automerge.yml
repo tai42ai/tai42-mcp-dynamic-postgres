@@ -1,0 +1,45 @@
+# Release PRs merge themselves the moment branch protection's required checks
+# pass — the release train has no human step. The PAT (not GITHUB_TOKEN) must
+# both enable auto-merge and author the merge commit: refs written by
+# GITHUB_TOKEN fire no workflows, so a GITHUB_TOKEN merge would strand the tag
+# before its published artifact ever built.
+#
+# The arming step tolerates a repo where "Allow auto-merge" is currently off: it
+# arms auto-merge when the setting is on and no-ops with a clear log line when it
+# is off, so arming turns on the moment an admin enables the setting, with no
+# workflow edit. Branch protection with required status checks is what makes
+# --auto HOLD the merge until CI is green.
+name: release-automerge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {}
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: >-
+      startsWith(github.head_ref, 'release-please--') &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Enable auto-merge on the release PR
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: |
+          set -uo pipefail
+          if out=$(gh pr merge --auto --squash "$PR_URL" 2>&1); then
+            echo "Auto-merge armed on $PR_URL"
+            exit 0
+          fi
+          echo "$out"
+          # "Allow auto-merge" disabled repo-wide: arm nothing, do not fail the PR.
+          if printf '%s' "$out" | grep -qiE 'auto[- ]merge is not allowed|not enabled|Allow auto-merge'; then
+            echo "::warning::Auto-merge is not enabled on this repository — skipping arming. \
+          Enable 'Allow auto-merge' in the repo settings to activate release auto-merge."
+            exit 0
+          fi
+          echo "::error::Failed to arm auto-merge on $PR_URL"
+          exit 1
