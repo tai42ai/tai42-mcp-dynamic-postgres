@@ -37,13 +37,14 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.6",
     "pyright>=1.1.390",
-    # The spec test validates the authored tai-plugin.yml (kind: mcp-server,
-    # contract-less) against PluginSpec and scans mcp.env markers with kit. The
-    # >=1.5/>=1.4 floors are the minors carrying the mcp-server kind and
-    # the marker-scan module; `<2` accepts every sibling minor. Installed via
+    # Dev-only validators; the shipped package imports no tai42 code. The spec
+    # test validates the authored tai-plugin.yml (kind: mcp-server, contract-less)
+    # against PluginSpec from tai42-contract, and scans its mcp.env markers and
+    # in-package docs with tai42-kit (scan_env_marker_refs, validate_docs). Each
+    # range accepts every sibling minor within the current major. Installed via
     # `uv sync --extra dev` in CI.
-    "tai42-contract>=1.5,<2",
-    "tai42-kit>=1.4,<2",
+    "tai42-contract>=9,<10",
+    "tai42-kit>=3.13,<4",
 ]
 test-integration = [
     "testcontainers[postgres]>=4.0",
