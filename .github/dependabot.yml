@@ -9,14 +9,16 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      # tai42-contract and tai42-kit validate the plugin descriptor from the dev
-      # extra; no part of them ships in the wheel. Every tai42-kit release
-      # requires one specific tai42-contract major, and that requirement moves in
-      # patch releases as well, so raising either package on its own leaves the
-      # other outside the range its partner accepts and the resolution has no
-      # solution. The two move together, by hand, with whatever the newer
-      # validators ask of the descriptor test.
+      # tai42-contract and tai42-kit are a version-locked pair that the dev extra
+      # uses to validate the plugin descriptor; no part of them ships in the
+      # wheel, and an update job raises one package at a time. A tai42-contract
+      # release inside the current major still satisfies the pinned tai42-kit, so
+      # only a new contract major is ignored; any tai42-kit release can require a
+      # different contract major, patch releases included, so every kit update is
+      # ignored and the pair is raised by hand, together.
       - dependency-name: tai42-contract
+        update-types:
+          - version-update:semver-major
       - dependency-name: tai42-kit
   # Keep the Docker base image (python:*-slim) current for security fixes.
   - package-ecosystem: docker
