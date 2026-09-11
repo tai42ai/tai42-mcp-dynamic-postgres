@@ -8,6 +8,16 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # tai42-contract and tai42-kit validate the plugin descriptor from the dev
+      # extra; no part of them ships in the wheel. Every tai42-kit release
+      # requires one specific tai42-contract major, and that requirement moves in
+      # patch releases as well, so raising either package on its own leaves the
+      # other outside the range its partner accepts and the resolution has no
+      # solution. The two move together, by hand, with whatever the newer
+      # validators ask of the descriptor test.
+      - dependency-name: tai42-contract
+      - dependency-name: tai42-kit
   # Keep the Docker base image (python:*-slim) current for security fixes.
   - package-ecosystem: docker
     directory: /
