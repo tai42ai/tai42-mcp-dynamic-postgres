@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tai42-mcp-dynamic-postgres"
-version = "0.5.0"
+version = "0.5.1"
 description = "Schema-driven generator for safe, scoped PostgreSQL DML tools in FastMCP agent systems"
 authors = [{ name = "tai42", email = "oss@tai42.ai" }]
 readme = "README.md"
