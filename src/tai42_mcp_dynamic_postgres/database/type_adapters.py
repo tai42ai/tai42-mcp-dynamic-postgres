@@ -14,8 +14,7 @@ class VectorLoader(Loader):
         if s.startswith("[") and s.endswith("]"):
             values = s[1:-1].split(",")
             return [float(x.strip()) for x in values if x.strip()]
-        else:
-            raise ValueError(f"Invalid vector format: {s}")
+        raise ValueError(f"Invalid vector format: {s}")
 
 
 async def register_vector_as_list(conn: AsyncConnection[Any]) -> None:

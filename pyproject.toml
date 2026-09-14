@@ -72,7 +72,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["tests", "scripts"]
 # Integration tests are opt-in (need Docker); run them with `pytest -m integration`.
 addopts = "-m 'not integration'"
 markers = [
@@ -88,19 +88,49 @@ fail_under = 97
 [tool.ruff]
 line-length = 120
 target-version = "py313"
-src = ["src", "tests"]
+src = ["src", "tests", "scripts"]
 
 [tool.ruff.lint]
 # Keep the project's existing typing style (typing.Optional / List): the `UP`
 # rule set is deliberately excluded so `Optional`/`List` are not rewritten.
-# Everything else enforces correctness, import order, and common cleanups.
-select = ["E", "W", "F", "I", "B", "C4", "SIM", "PIE", "PT", "RUF", "TID"]
+# Cyclomatic complexity (C901) and function length (PLR0912/PLR0915) run at
+# ruff's default thresholds; module length is enforced by scripts/check_file_size.py.
+# Everything else enforces correctness, import order, security, and common cleanups.
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "SIM",
+    "PIE",
+    "PT",
+    "RUF",
+    "TID",
+    "C901",
+    "PLR0912",
+    "PLR0915",
+    "N",
+    "A",
+    "RET",
+    "PERF",
+    "FURB",
+    "T20",
+    "S",
+]
 
 [tool.ruff.lint.per-file-ignores]
 # These modules embed generated-tool source as string templates; their tool
 # docstrings are intentionally long single lines and must not be reflowed.
 "src/tai42_mcp_dynamic_postgres/gen/builders/select_gen.py" = ["E501"]
 "src/tai42_mcp_dynamic_postgres/gen/builders/select_joined_gen.py" = ["E501"]
+# Tests carry no size or complexity cap, and assert / exec / bind-all-interfaces
+# are legitimate inside the suite.
+"tests/**" = ["C901", "PLR0912", "PLR0915", "S101", "S102", "S104"]
+# This CLI diagnostic reports offenders on stdout.
+"scripts/check_file_size.py" = ["T201"]
+"scripts/test_check_file_size.py" = ["S101", "C901", "PLR0912", "PLR0915"]
 
 [tool.pyright]
 include = ["src"]
