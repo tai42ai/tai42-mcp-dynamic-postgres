@@ -10,7 +10,7 @@ from psycopg.rows import AsyncRowFactory
 from psycopg_pool import AsyncConnectionPool
 
 from tai42_mcp_dynamic_postgres.config.settings import pg_settings
-from tai42_mcp_dynamic_postgres.database.helpers import register_types_loaders
+from tai42_mcp_dynamic_postgres.database.type_adapters import register_types_loaders
 
 logger = logging.getLogger(__name__)
 

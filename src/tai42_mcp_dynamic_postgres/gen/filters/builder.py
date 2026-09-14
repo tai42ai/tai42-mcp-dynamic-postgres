@@ -79,48 +79,63 @@ def _render_condition(ident: sql.Identifier, condition: FilterOp, params: List[A
     return clauses
 
 
-def _build(op: Optional[WhereFilter], resolver: ColumnResolver) -> Tuple[Optional[sql.Composable], List[Any]]:
-    if not op:
-        return None, []
+def _build_logical(logical: LogicalFilter, resolver: ColumnResolver) -> Tuple[Optional[sql.Composable], List[Any]]:
+    """Render an AND/OR/NOT node, recursing into each subfilter via ``_build``.
 
-    inner = op.root
+    Each present combinator becomes a parenthesized group; the groups are ANDed
+    together. A combinator whose subfilters all resolve empty contributes nothing.
+    """
     params: List[Any] = []
+    groups: List[sql.Composable] = []
 
-    if isinstance(inner, LogicalFilter):
-        groups: List[sql.Composable] = []
-
-        def add_group(joiner: sql.SQL, subfilters: List[WhereFilter]) -> None:
-            parts: List[sql.Composable] = []
-            for sub in subfilters:
-                clause, sub_params = _build(sub, resolver)
-                params.extend(sub_params)
-                if clause is not None:
-                    parts.append(clause)
-            if parts:
-                groups.append(sql.SQL("({})").format(joiner.join(parts)))
-
-        if inner.AND:
-            add_group(sql.SQL(" AND "), inner.AND)
-        if inner.OR:
-            add_group(sql.SQL(" OR "), inner.OR)
-        if inner.NOT:
-            clause, sub_params = _build(inner.NOT, resolver)
+    def add_group(joiner: sql.SQL, subfilters: List[WhereFilter]) -> None:
+        parts: List[sql.Composable] = []
+        for sub in subfilters:
+            clause, sub_params = _build(sub, resolver)
             params.extend(sub_params)
             if clause is not None:
-                groups.append(sql.SQL("(NOT ({}))").format(clause))
+                parts.append(clause)
+        if parts:
+            groups.append(sql.SQL("({})").format(joiner.join(parts)))
 
-        if not groups:
-            return None, params
-        return sql.SQL(" AND ").join(groups), params
+    if logical.AND:
+        add_group(sql.SQL(" AND "), logical.AND)
+    if logical.OR:
+        add_group(sql.SQL(" OR "), logical.OR)
+    if logical.NOT:
+        clause, sub_params = _build(logical.NOT, resolver)
+        params.extend(sub_params)
+        if clause is not None:
+            groups.append(sql.SQL("(NOT ({}))").format(clause))
 
-    # inner is Dict[str, FilterOp] (the only other member of the root union).
+    if not groups:
+        return None, params
+    return sql.SQL(" AND ").join(groups), params
+
+
+def _build_field_conditions(
+    field_map: Dict[str, FilterOp], resolver: ColumnResolver
+) -> Tuple[Optional[sql.Composable], List[Any]]:
+    """Render a field -> condition map into ANDed comparison clauses."""
+    params: List[Any] = []
     clauses: List[sql.Composable] = []
-    for field, condition in inner.items():
+    for field, condition in field_map.items():
         ident = _resolve(field, resolver)
         clauses.extend(_render_condition(ident, condition, params))
     if not clauses:
         return None, params
     return sql.SQL(" AND ").join(clauses), params
+
+
+def _build(op: Optional[WhereFilter], resolver: ColumnResolver) -> Tuple[Optional[sql.Composable], List[Any]]:
+    if not op:
+        return None, []
+
+    inner = op.root
+    if isinstance(inner, LogicalFilter):
+        return _build_logical(inner, resolver)
+    # inner is Dict[str, FilterOp] (the only other member of the root union).
+    return _build_field_conditions(inner, resolver)
 
 
 def build_where_clause(

@@ -69,15 +69,15 @@ def capture(monkeypatch):
         def fake_cursor(*args, **kwargs):
             return cur
 
-        import tai42_mcp_dynamic_postgres.gen.templates.common as common_mod
         import tai42_mcp_dynamic_postgres.gen.templates.delete as delete_mod
         import tai42_mcp_dynamic_postgres.gen.templates.insert as insert_mod
+        import tai42_mcp_dynamic_postgres.gen.templates.select_runner as select_runner_mod
         import tai42_mcp_dynamic_postgres.gen.templates.update as update_mod
 
         monkeypatch.setattr(insert_mod, "get_connection_pool", fake_pool)
         monkeypatch.setattr(update_mod, "get_connection_pool", fake_pool)
         monkeypatch.setattr(delete_mod, "get_connection_pool", fake_pool)
-        monkeypatch.setattr(common_mod, "cursor", fake_cursor)
+        monkeypatch.setattr(select_runner_mod, "cursor", fake_cursor)
         return cap
 
     return install

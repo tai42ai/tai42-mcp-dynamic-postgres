@@ -94,13 +94,8 @@ class SelectJoinedGen(BaseGen):
                 return [([*b_parts, fc], [*a_parts, rc]) for fc, rc in zip(fk_cols, ref_cols, strict=True)]
         return None
 
-    def generate_join_tool(
-        self, group: List[str], tables: Dict[str, TableInfo], fks: List[ForeignKey]
-    ) -> Optional[Chunk]:
-        if len(group) < 2:
-            raise ValueError("Join group must have at least two tables.")
-
-        # Build join steps in the order provided, joining each to a previous table.
+    def _build_join_steps(self, group: List[str], fks: List[ForeignKey]) -> List[JoinStep]:
+        """Order the joins, binding each table to a previously-joined one by FK."""
         joins: List[JoinStep] = []
         current_tables = [group[0]]
         for t in group[1:]:
@@ -113,9 +108,17 @@ class SelectJoinedGen(BaseGen):
                 raise ValueError(f"No foreign key relationship found to join {t} with any of {current_tables}")
             joins.append((t.split("."), cond))
             current_tables.append(t)
+        return joins
 
-        # Collect columns with schema-qualified aliases so equal table names in
-        # different schemas (s1.users, s2.users) do not collide on alias.
+    def _collect_join_columns(
+        self, group: List[str], tables: Dict[str, TableInfo]
+    ) -> Tuple[Dict[str, str], List[Tuple[List[str], str]], List[Tuple[str, str]]]:
+        """Collect columns with schema-qualified aliases so equal table names in
+        different schemas (s1.users, s2.users) do not collide on alias.
+
+        Returns ``(column_map, select_items, model_columns)``. Non-base-table
+        columns are made Optional because an outer join can leave them null.
+        """
         column_map: Dict[str, str] = {}
         select_items: List[Tuple[List[str], str]] = []
         model_columns: List[Tuple[str, str]] = []
@@ -137,6 +140,16 @@ class SelectJoinedGen(BaseGen):
                 if t != base_table and not typ.startswith("Optional["):
                     typ = f"Optional[{typ}]"
                 model_columns.append((alias, typ))
+        return column_map, select_items, model_columns
+
+    def generate_join_tool(
+        self, group: List[str], tables: Dict[str, TableInfo], fks: List[ForeignKey]
+    ) -> Optional[Chunk]:
+        if len(group) < 2:
+            raise ValueError("Join group must have at least two tables.")
+
+        joins = self._build_join_steps(group, fks)
+        column_map, select_items, model_columns = self._collect_join_columns(group, tables)
 
         # All projected columns ignored -> empty SELECT and empty Row model, so the
         # tool would raise on every call. Skip rather than register a dead tool.

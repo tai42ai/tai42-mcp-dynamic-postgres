@@ -5,7 +5,7 @@ from psycopg import sql
 from tai42_mcp_dynamic_postgres.gen.filters.builder import resolver_from_columns
 from tai42_mcp_dynamic_postgres.gen.filters.models import WhereFilter
 from tai42_mcp_dynamic_postgres.gen.order.models import OrderByItem
-from tai42_mcp_dynamic_postgres.gen.templates.common import run_select
+from tai42_mcp_dynamic_postgres.gen.templates.select_runner import run_select
 
 
 async def select_tmpl(

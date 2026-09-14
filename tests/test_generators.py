@@ -1,6 +1,6 @@
 import pytest
 
-from schema_helpers import col, schema, table
+from schema_builders import col, schema, table
 from tai42_mcp_dynamic_postgres.gen.builders.delete_gen import DeleteGen
 from tai42_mcp_dynamic_postgres.gen.builders.insert_gen import InsertGen
 from tai42_mcp_dynamic_postgres.gen.builders.select_gen import SelectGen

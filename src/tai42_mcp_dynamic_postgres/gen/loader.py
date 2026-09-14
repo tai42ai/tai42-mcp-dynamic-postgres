@@ -67,16 +67,17 @@ def _check_select_joined_name_collisions(gen: SelectJoinedGen, tables: Dict[str,
         seen[name] = group
 
 
-async def load_dynamic_tools(
-    overwrite: bool = True,
-    readonly: bool = False,
-    allow_unfiltered: bool = False,
-    ignore_insert_columns: Optional[List[str]] = None,
-    ignore_select_columns: Optional[List[str]] = None,
-    ignore_update_columns: Optional[List[str]] = None,
-    ignore_select_joined_columns: Optional[List[str]] = None,
-    select_joined: Optional[List[List[str]]] = None,
-) -> None:
+def _build_generators(
+    readonly: bool,
+    allow_unfiltered: bool,
+    ignore_insert_columns: Optional[List[str]],
+    ignore_select_columns: Optional[List[str]],
+    ignore_update_columns: Optional[List[str]],
+    ignore_select_joined_columns: Optional[List[str]],
+    select_joined: Optional[List[List[str]]],
+) -> List[BaseGen]:
+    """Assemble the generator set for this load; write generators are dropped in
+    ``readonly`` mode so no insert/update/delete tool is ever emitted."""
     gen_list: List[BaseGen] = []
     gen_list.append(SelectJoinedGen(select_joined, ignore_select_joined_columns))
     gen_list.append(SelectGen(ignore_select_columns))
@@ -86,6 +87,12 @@ async def load_dynamic_tools(
         gen_list.append(UpdateGen(ignore_update_columns, allow_unfiltered=allow_unfiltered))
         gen_list.append(DeleteGen(allow_unfiltered=allow_unfiltered))
 
+    return gen_list
+
+
+async def _generate_tool_files(gen_list: List[BaseGen], overwrite: bool) -> None:
+    """Introspect the schema and write each generator's tool file, guarding
+    against schema/table and select-joined name collisions before any write."""
     to_generate = gen_list if overwrite else [gen for gen in gen_list if not gen.is_exists]
     if to_generate:
         tables, fks = await introspect_schema()
@@ -96,13 +103,24 @@ async def load_dynamic_tools(
         for gen in to_generate:
             gen.generate_file(tables, fks)
 
-    # Prune previously-generated tool files not part of this load, so a later
-    # --readonly run never serves stale write tools.
+
+def _prune_stale_tool_files(gen_list: List[BaseGen]) -> None:
+    """Delete previously-generated tool files not part of this load, so a later
+    --readonly run never serves stale write tools."""
     expected = {f"{gen.module_name}.py" for gen in gen_list}
     for path in OUTPUT_DIR.glob(f"*{TOOLS_SUFFIX}.py"):
         if path.name not in expected:
             path.unlink()
 
+
+async def _import_and_track_tools(gen_list: List[BaseGen]) -> None:
+    """Import exactly this load's tool modules and track the tools each registers.
+
+    The writable output dir is made importable, tools of modules no longer
+    generated are deregistered, and each module is reloaded (if already imported)
+    or imported. Tracking runs in ``finally`` so tools registered before a
+    mid-module raise are still removable, not leaked.
+    """
     # Make the writable output dir importable, then import exactly this load's
     # modules (never a blanket walk of whatever files happen to be on disk).
     if str(OUTPUT_DIR) not in tools.__path__:
@@ -132,6 +150,28 @@ async def load_dynamic_tools(
         except ImportError as e:
             raise ImportError(f"Failed to import generated tool module {module_name!r}: {e}") from e
         finally:
-            # Record the tools this module added, in ``finally`` so tools registered
-            # before a mid-module raise are still tracked and removable, not leaked.
             _registered_tools[gen.module_name] = await _live_tool_names() - before
+
+
+async def load_dynamic_tools(
+    overwrite: bool = True,
+    readonly: bool = False,
+    allow_unfiltered: bool = False,
+    ignore_insert_columns: Optional[List[str]] = None,
+    ignore_select_columns: Optional[List[str]] = None,
+    ignore_update_columns: Optional[List[str]] = None,
+    ignore_select_joined_columns: Optional[List[str]] = None,
+    select_joined: Optional[List[List[str]]] = None,
+) -> None:
+    gen_list = _build_generators(
+        readonly,
+        allow_unfiltered,
+        ignore_insert_columns,
+        ignore_select_columns,
+        ignore_update_columns,
+        ignore_select_joined_columns,
+        select_joined,
+    )
+    await _generate_tool_files(gen_list, overwrite)
+    _prune_stale_tool_files(gen_list)
+    await _import_and_track_tools(gen_list)

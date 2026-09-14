@@ -5,7 +5,7 @@ from psycopg import sql
 from tai42_mcp_dynamic_postgres.gen.filters.builder import resolver_from_column_map
 from tai42_mcp_dynamic_postgres.gen.filters.models import WhereFilter
 from tai42_mcp_dynamic_postgres.gen.order.models import OrderByItem
-from tai42_mcp_dynamic_postgres.gen.templates.common import run_select
+from tai42_mcp_dynamic_postgres.gen.templates.select_runner import run_select
 
 # A select item as (identifier_parts, alias), e.g. (["public", "users", "id"], "public_users_id").
 SelectItem = Tuple[List[str], str]
