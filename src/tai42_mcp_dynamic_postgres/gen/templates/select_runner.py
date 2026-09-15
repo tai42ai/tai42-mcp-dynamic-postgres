@@ -1,3 +1,5 @@
+"""Shared query executor for the generated single-table and joined select tools."""
+
 from typing import Any, Dict, List, Optional, Type, Union, cast
 
 from psycopg import sql

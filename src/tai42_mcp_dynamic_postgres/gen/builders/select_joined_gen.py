@@ -1,3 +1,5 @@
+"""Generator for ``select_joined`` tools over FK-related table groups."""
+
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from tai42_mcp_dynamic_postgres.gen.builders.base_gen import BaseGen, Chunk
@@ -57,15 +59,19 @@ async def {func_name}(where: Optional[WhereFilter] = None, order_by: Optional[Li
 
 
 class SelectJoinedGen(BaseGen):
+    """Emits one ``select_joined`` tool and model per configured table group."""
+
     def __init__(
         self,
         join_groups: Optional[List[List[str]]] = None,
         ignore_columns: Optional[List[str]] = None,
     ) -> None:
+        """Configure the generator with the join groups and columns to exclude."""
         super().__init__(_FUNC_PREFIX, _IMPORTS, _TOOL_TEMPLATE, ignore_columns)
         self.join_groups = join_groups or []
 
     def tool_chunks(self, tables: Dict[str, TableInfo], fks: List[ForeignKey]) -> Iterable[Chunk]:
+        """Yield one chunk per join group that projects at least one column."""
         for group in self.join_groups:
             chunk = self.generate_join_tool(group, tables, fks)
             if chunk is not None:
@@ -85,6 +91,7 @@ class SelectJoinedGen(BaseGen):
         return f"{schema_name}_{table_names}"
 
     def find_join_condition(self, table_a: str, table_b: str, fks: List[ForeignKey]) -> Optional[List[JoinCondition]]:
+        """Return the FK join predicate between two tables, or None if none relates them."""
         a_parts = table_a.split(".")
         b_parts = table_b.split(".")
         for fk_table, fk_cols, ref_table, ref_cols in fks:
@@ -113,11 +120,12 @@ class SelectJoinedGen(BaseGen):
     def _collect_join_columns(
         self, group: List[str], tables: Dict[str, TableInfo]
     ) -> Tuple[Dict[str, str], List[Tuple[List[str], str]], List[Tuple[str, str]]]:
-        """Collect columns with schema-qualified aliases so equal table names in
-        different schemas (s1.users, s2.users) do not collide on alias.
+        """Collect join columns under schema-qualified aliases.
 
-        Returns ``(column_map, select_items, model_columns)``. Non-base-table
-        columns are made Optional because an outer join can leave them null.
+        Aliasing keeps equal table names in different schemas (s1.users,
+        s2.users) from colliding. Returns ``(column_map, select_items,
+        model_columns)``; non-base-table columns are made Optional because an
+        outer join can leave them null.
         """
         column_map: Dict[str, str] = {}
         select_items: List[Tuple[List[str], str]] = []
@@ -145,6 +153,7 @@ class SelectJoinedGen(BaseGen):
     def generate_join_tool(
         self, group: List[str], tables: Dict[str, TableInfo], fks: List[ForeignKey]
     ) -> Optional[Chunk]:
+        """Build the joined model and tool code for ``group``, or None if it projects no columns."""
         if len(group) < 2:
             raise ValueError("Join group must have at least two tables.")
 

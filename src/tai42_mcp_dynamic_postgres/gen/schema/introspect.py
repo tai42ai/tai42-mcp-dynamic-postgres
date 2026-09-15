@@ -1,3 +1,5 @@
+"""Introspect a live PostgreSQL schema into table, column, and foreign-key models."""
+
 import keyword
 import re
 from dataclasses import dataclass
@@ -35,10 +37,12 @@ class TableInfo:
 
     @property
     def qualified(self) -> str:
+        """The ``schema.name`` identifier of this relation."""
         return f"{self.schema}.{self.name}"
 
     @property
     def writable(self) -> bool:
+        """Whether this relation accepts DML (ordinary or partitioned tables only)."""
         # Ordinary and partitioned tables accept DML; views/matviews are read-only.
         return self.kind in ("r", "p")
 

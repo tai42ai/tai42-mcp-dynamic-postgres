@@ -1,3 +1,5 @@
+"""Generate the tool files, prune stale ones, and register the tools on the app."""
+
 import importlib
 import sys
 from typing import Dict, List, Optional, Set
@@ -76,8 +78,11 @@ def _build_generators(
     ignore_select_joined_columns: Optional[List[str]],
     select_joined: Optional[List[List[str]]],
 ) -> List[BaseGen]:
-    """Assemble the generator set for this load; write generators are dropped in
-    ``readonly`` mode so no insert/update/delete tool is ever emitted."""
+    """Assemble the generator set for this load.
+
+    Write generators are dropped in ``readonly`` mode so no insert/update/delete
+    tool is ever emitted.
+    """
     gen_list: List[BaseGen] = []
     gen_list.append(SelectJoinedGen(select_joined, ignore_select_joined_columns))
     gen_list.append(SelectGen(ignore_select_columns))
@@ -91,8 +96,10 @@ def _build_generators(
 
 
 async def _generate_tool_files(gen_list: List[BaseGen], overwrite: bool) -> None:
-    """Introspect the schema and write each generator's tool file, guarding
-    against schema/table and select-joined name collisions before any write."""
+    """Introspect the schema and write each generator's tool file.
+
+    Schema/table and select-joined name collisions are checked before any write.
+    """
     to_generate = gen_list if overwrite else [gen for gen in gen_list if not gen.is_exists]
     if to_generate:
         tables, fks = await introspect_schema()
@@ -105,8 +112,10 @@ async def _generate_tool_files(gen_list: List[BaseGen], overwrite: bool) -> None
 
 
 def _prune_stale_tool_files(gen_list: List[BaseGen]) -> None:
-    """Delete previously-generated tool files not part of this load, so a later
-    --readonly run never serves stale write tools."""
+    """Delete previously-generated tool files not part of this load.
+
+    A later --readonly run then never serves stale write tools.
+    """
     expected = {f"{gen.module_name}.py" for gen in gen_list}
     for path in OUTPUT_DIR.glob(f"*{TOOLS_SUFFIX}.py"):
         if path.name not in expected:
@@ -163,6 +172,11 @@ async def load_dynamic_tools(
     ignore_select_joined_columns: Optional[List[str]] = None,
     select_joined: Optional[List[List[str]]] = None,
 ) -> None:
+    """Generate, prune, and (re)register the scoped tools for the live schema.
+
+    Safe to call again in the same process: regenerated modules are reloaded and
+    tools of no-longer-generated modules are deregistered.
+    """
     gen_list = _build_generators(
         readonly,
         allow_unfiltered,

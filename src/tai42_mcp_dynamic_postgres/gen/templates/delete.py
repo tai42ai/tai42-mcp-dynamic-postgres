@@ -1,3 +1,5 @@
+"""Runtime helper backing the generated ``delete`` tools."""
+
 from typing import List, Optional
 
 from psycopg import sql
@@ -15,6 +17,10 @@ async def delete_tmpl(
     where: Optional[WhereFilter] = None,
     allow_unfiltered: bool = False,
 ) -> int:
+    """Delete rows from ``table`` matching ``where`` and return the row count.
+
+    Raises if no filter is given unless ``allow_unfiltered`` is set.
+    """
     resolver = resolver_from_columns(columns)
     where_clause, params = build_where_clause(where, resolver)
 

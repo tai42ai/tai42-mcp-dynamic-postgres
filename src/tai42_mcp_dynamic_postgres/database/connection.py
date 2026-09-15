@@ -1,3 +1,5 @@
+"""Process-wide async connection pool and cursor helpers."""
+
 import asyncio
 import logging
 from collections.abc import AsyncGenerator
@@ -39,6 +41,11 @@ def _build_conninfo() -> str:
 
 
 async def get_connection_pool() -> AsyncConnectionPool[AsyncConnection[Any]]:
+    """Return the process-wide pool, opening it on first use.
+
+    A partial pool that fails to open is closed before the error propagates, so
+    no background workers are orphaned.
+    """
     global _pool
     async with _pool_lock:
         if _pool is None:
@@ -64,6 +71,7 @@ async def get_connection_pool() -> AsyncConnectionPool[AsyncConnection[Any]]:
 
 
 async def close_connection_pool() -> None:
+    """Close the pool if one was opened; a no-op when none exists."""
     # Only close a pool that was actually created; do not build one just to close it.
     global _pool
     async with _pool_lock:
@@ -114,6 +122,11 @@ async def cursor(
     scrollable: Optional[bool] = None,
     withhold: bool = False,
 ) -> AsyncGenerator[AsyncCursor[Any], None]:
+    """Async context manager yielding a cursor over a pooled connection.
+
+    ``row_factory`` is forwarded only when supplied, so the connection's default
+    applies otherwise.
+    """
     # Forward row_factory only when supplied so the connection's default
     # row factory is used otherwise.
     extra: dict[str, Any] = {} if row_factory is None else {"row_factory": row_factory}

@@ -1,9 +1,13 @@
+"""Pydantic models describing the ORDER BY payload accepted by generated select tools."""
+
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel
 
 
 class KnnOrder(BaseModel):
+    """Order by vector distance: query vector, distance metric, and direction."""
+
     model_config = {"extra": "forbid"}
 
     query: List[float]
@@ -12,6 +16,8 @@ class KnnOrder(BaseModel):
 
 
 class OrderByItem(BaseModel):
+    """One sort key: a field (or KNN distance) with direction and NULLS placement."""
+
     model_config = {"extra": "forbid"}
 
     field: str

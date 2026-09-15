@@ -1,3 +1,5 @@
+"""Click entry point that generates the tools and runs the MCP server."""
+
 import asyncio
 import logging
 import sys
@@ -28,6 +30,11 @@ async def runner(
     host: str,
     port: int,
 ) -> Optional[int]:
+    """Generate the tools, verify the database, and run the server on ``transport``.
+
+    Returns a process exit code on interruption or failure, or ``None`` on a
+    clean shutdown.
+    """
     if transport == "stdio" and (host != "127.0.0.1" or port != 8000):
         raise click.BadParameter("Host and port should not be set when using 'stdio' transport.")
 

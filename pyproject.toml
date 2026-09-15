@@ -118,7 +118,19 @@ select = [
     "FURB",
     "T20",
     "S",
+    "TRY",
+    "ERA",
+    "D",
 ]
+ignore = [
+    # Vanilla messages passed straight to a raised exception are intentional:
+    # the errors carry rich contextual detail at the raise site rather than in
+    # bespoke exception subclasses.
+    "TRY003",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 # These modules embed generated-tool source as string templates; their tool
@@ -126,11 +138,11 @@ select = [
 "src/tai42_mcp_dynamic_postgres/gen/builders/select_gen.py" = ["E501"]
 "src/tai42_mcp_dynamic_postgres/gen/builders/select_joined_gen.py" = ["E501"]
 # Tests carry no size or complexity cap, and assert / exec / bind-all-interfaces
-# are legitimate inside the suite.
-"tests/**" = ["C901", "PLR0912", "PLR0915", "S101", "S102", "S104"]
+# are legitimate inside the suite. Docstrings are not required on test helpers.
+"tests/**" = ["C901", "PLR0912", "PLR0915", "S101", "S102", "S104", "D"]
 # This CLI diagnostic reports offenders on stdout.
 "scripts/check_file_size.py" = ["T201"]
-"scripts/test_check_file_size.py" = ["S101", "C901", "PLR0912", "PLR0915"]
+"scripts/test_check_file_size.py" = ["S101", "C901", "PLR0912", "PLR0915", "D"]
 
 [tool.pyright]
 include = ["src"]

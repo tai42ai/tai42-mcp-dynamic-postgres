@@ -1,3 +1,5 @@
+"""Generator for the per-table ``select`` tool and its row model."""
+
 from typing import List, Optional
 
 from tai42_mcp_dynamic_postgres.gen.builders.base_gen import Chunk, TableGen
@@ -41,10 +43,14 @@ async def {func_name}(where: Optional[WhereFilter] = None, order_by: Optional[Li
 
 
 class SelectGen(TableGen):
+    """Emits a ``select`` tool and row model per relation."""
+
     def __init__(self, ignore_columns: Optional[List[str]] = None) -> None:
+        """Configure the generator, excluding ``ignore_columns`` from the projection."""
         super().__init__(_FUNC_PREFIX, _IMPORTS, _TOOL_TEMPLATE, ignore_columns)
 
     def generate_tool(self, table_info: TableInfo) -> Optional[Chunk]:
+        """Build the select model and tool code for ``table_info``, or None to skip it."""
         included = self.included(table_info)
         # All columns ignored -> empty projection and empty Row model, so the tool
         # would raise on every call. Skip rather than register a dead tool.

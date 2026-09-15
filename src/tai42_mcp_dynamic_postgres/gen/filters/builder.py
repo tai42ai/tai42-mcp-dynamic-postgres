@@ -1,3 +1,5 @@
+"""Build parameterized SQL WHERE clauses from :class:`WhereFilter` payloads."""
+
 from typing import Any, Dict, List, Optional, Tuple
 
 from psycopg import sql

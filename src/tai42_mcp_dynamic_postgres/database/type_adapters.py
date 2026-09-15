@@ -1,3 +1,5 @@
+"""psycopg loaders and dumpers registered on each pooled connection."""
+
 import warnings
 from typing import Any, List
 
@@ -9,7 +11,10 @@ from psycopg.types.json import JsonDumper
 
 
 class VectorLoader(Loader):
+    """Loads a pgvector value into a list of floats."""
+
     def load(self, data: Buffer) -> List[float]:
+        """Parse a ``[x,y,z]`` pgvector text value into a list of floats."""
         s = bytes(data).decode("utf-8")
         if s.startswith("[") and s.endswith("]"):
             values = s[1:-1].split(",")
@@ -18,6 +23,7 @@ class VectorLoader(Loader):
 
 
 async def register_vector_as_list(conn: AsyncConnection[Any]) -> None:
+    """Register the pgvector loader on ``conn``, warning if the extension is absent."""
     tinfo = await TypeInfo.fetch(conn, "vector")
     if not tinfo:
         warnings.warn(
@@ -30,6 +36,7 @@ async def register_vector_as_list(conn: AsyncConnection[Any]) -> None:
 
 
 def register_json_dumpers(conn: AsyncConnection[Any]) -> None:
+    """Register a dumper so a bare ``dict`` binds as JSON on ``conn``."""
     # Safety net so a bare ``dict`` binds as JSON. Generated insert/update tools
     # already wrap json/jsonb values in ``Json(...)`` by column type, so array
     # columns keep their native list adapter.
@@ -37,6 +44,7 @@ def register_json_dumpers(conn: AsyncConnection[Any]) -> None:
 
 
 async def register_types_loaders(conn: AsyncConnection[Any]) -> None:
+    """Register every custom loader and dumper on a newly configured connection."""
     # Temporal and uuid types keep psycopg's native loaders, matching the native
     # annotations the code generator emits for those columns.
     await register_vector_as_list(conn)

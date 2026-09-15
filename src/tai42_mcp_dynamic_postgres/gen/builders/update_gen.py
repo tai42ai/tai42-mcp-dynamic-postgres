@@ -1,3 +1,5 @@
+"""Generator for the per-table ``update`` tool and its partial-update model."""
+
 from typing import List, Optional, Tuple
 
 from tai42_mcp_dynamic_postgres.gen.builders.base_gen import Chunk, TableGen
@@ -47,13 +49,17 @@ async def {func_name}(data: {model_name}, where: Optional[WhereFilter] = None) -
 
 
 class UpdateGen(TableGen):
+    """Emits an ``update`` tool and partial-update model per writable table."""
+
     writable_only = True
 
     def __init__(self, ignore_columns: Optional[List[str]] = None, allow_unfiltered: bool = False) -> None:
+        """Configure the generator, excluding ``ignore_columns`` and optionally allowing unfiltered updates."""
         super().__init__(_FUNC_PREFIX, _IMPORTS, _TOOL_TEMPLATE, ignore_columns)
         self.allow_unfiltered = allow_unfiltered
 
     def generate_tool(self, table_info: TableInfo) -> Optional[Chunk]:
+        """Build the update model and tool code for ``table_info``, or None to skip it."""
         included = self.included(table_info)
         # Every updatable column ignored -> the tool can never set a field and
         # raises on every call. Skip rather than register a dead tool.

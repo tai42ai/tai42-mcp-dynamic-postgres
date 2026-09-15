@@ -1,3 +1,5 @@
+"""Runtime helper backing the generated ``update`` tools."""
+
 from typing import List, Optional, Sequence
 
 from psycopg import sql
@@ -17,6 +19,11 @@ async def update_tmpl(
     allow_unfiltered: bool = False,
     json_columns: Optional[Sequence[str]] = None,
 ) -> int:
+    """Update rows of ``table`` with the fields set on ``data`` and return the row count.
+
+    Only supplied fields are written; raises on an empty payload, and raises for
+    a missing filter unless ``allow_unfiltered`` is set.
+    """
     # Only columns the caller actually supplied are updated; an omitted field is
     # left untouched, while an explicit null is kept so it writes SET col = NULL.
     provided = data.model_fields_set

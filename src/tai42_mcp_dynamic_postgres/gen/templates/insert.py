@@ -1,3 +1,5 @@
+"""Runtime helper backing the generated ``insert`` tools."""
+
 from typing import AbstractSet, Any, List, Optional, Sequence, Tuple, Union
 
 from psycopg import sql

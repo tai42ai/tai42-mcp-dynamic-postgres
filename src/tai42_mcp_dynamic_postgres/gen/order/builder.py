@@ -1,3 +1,5 @@
+"""Build parameterized SQL ORDER BY clauses from :class:`OrderByItem` lists."""
+
 from typing import Any, Dict, List, Optional, Tuple
 
 from psycopg import sql

@@ -1,3 +1,5 @@
+"""Runtime helper backing the generated ``select_joined`` tools."""
+
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 from psycopg import sql
@@ -26,6 +28,10 @@ async def select_joined_tmpl(
     offset: Optional[int] = None,
     model: Optional[Type[Any]] = None,
 ) -> List[Any]:
+    """Run the joined SELECT and return rows as ``model`` instances (or dicts).
+
+    Applies the aliased ``where``, ``order_by``, ``limit``, and ``offset``.
+    """
     # Every exposed column is projected explicitly (ignored columns are already
     # absent from ``select_items``); an empty projection would build an invalid
     # ``SELECT`` with no columns, so fail loudly instead.

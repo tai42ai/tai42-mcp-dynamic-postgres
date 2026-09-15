@@ -1,3 +1,5 @@
+"""Generator for the per-table ``delete`` tool."""
+
 from typing import Optional
 
 from tai42_mcp_dynamic_postgres.gen.builders.base_gen import Chunk, TableGen
@@ -34,13 +36,17 @@ async def {func_name}(where: Optional[WhereFilter] = None) -> int:
 
 
 class DeleteGen(TableGen):
+    """Emits a ``delete`` tool per writable table."""
+
     writable_only = True
 
     def __init__(self, allow_unfiltered: bool = False) -> None:
+        """Configure the generator, optionally allowing deletes with no WHERE filter."""
         super().__init__(_FUNC_PREFIX, _IMPORTS, _TOOL_TEMPLATE)
         self.allow_unfiltered = allow_unfiltered
 
     def generate_tool(self, table_info: TableInfo) -> Optional[Chunk]:
+        """Build the delete tool code for ``table_info`` (no model)."""
         tool_code = self.template.format(
             func_name=self.func_name(table_info.qualified),
             table=table_info.qualified,

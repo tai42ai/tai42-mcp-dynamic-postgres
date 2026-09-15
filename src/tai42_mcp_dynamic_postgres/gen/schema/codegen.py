@@ -1,3 +1,5 @@
+"""Map PostgreSQL types to Python annotations and build Pydantic row models."""
+
 from typing import AbstractSet, FrozenSet, List, Tuple
 
 # PostgreSQL scalar type -> Python annotation. Arrays derive ``T[]`` -> ``List[T]``;
@@ -47,7 +49,7 @@ SQL_TO_PYTHON = {
     "cidr": "str",
     "macaddr": "str",
     "interval": "str",
-    # Vector (pgvector)
+    # Vector (pgvector)  # noqa: ERA001 - section label for the pgvector entry, not commented-out code
     "vector": "List[float]",
 }
 
@@ -99,6 +101,11 @@ def is_json_type(sql_type: str) -> bool:
 
 
 def sql_columns_to_pydantic_model(prefix: str, table: str, columns: List[Tuple[str, str]]) -> Tuple[str, str]:
+    """Return the model class name and its generated source for the given columns.
+
+    Optional-typed columns default to ``None``; an empty column list yields a
+    body of ``pass``.
+    """
     name = f"{prefix}_{table}_row"
     model_name = "".join(word.capitalize() for word in name.replace(".", "_").split("_"))
 

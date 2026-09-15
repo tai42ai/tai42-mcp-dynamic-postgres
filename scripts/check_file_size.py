@@ -15,6 +15,7 @@ SOURCE_DIRS = ("src", "scripts")
 
 
 def is_test_file(path: Path) -> bool:
+    """Return whether ``path`` is a test module exempt from the line cap."""
     if "tests" in path.parts:
         return True
     name = path.name
@@ -22,11 +23,13 @@ def is_test_file(path: Path) -> bool:
 
 
 def count_lines(path: Path) -> int:
+    """Return the number of lines in ``path``."""
     with path.open("rb") as handle:
         return sum(1 for _ in handle)
 
 
 def python_sources(source_dirs: Iterable[Path]) -> Iterator[Path]:
+    """Yield every non-test ``.py`` file under the given source directories."""
     for base in source_dirs:
         if not base.exists():
             continue
@@ -36,6 +39,7 @@ def python_sources(source_dirs: Iterable[Path]) -> Iterator[Path]:
 
 
 def oversized_modules(source_dirs: Iterable[Path], max_lines: int) -> list[tuple[Path, int]]:
+    """Return each source module exceeding ``max_lines`` as ``(path, line_count)``."""
     offenders: list[tuple[Path, int]] = []
     for path in python_sources(source_dirs):
         lines = count_lines(path)
@@ -45,6 +49,7 @@ def oversized_modules(source_dirs: Iterable[Path], max_lines: int) -> list[tuple
 
 
 def main() -> int:
+    """Report oversized modules and return a non-zero exit code if any exist."""
     root = Path(__file__).resolve().parent.parent
     source_dirs = [root / name for name in SOURCE_DIRS]
     offenders = oversized_modules(source_dirs, MAX_SOURCE_LINES)

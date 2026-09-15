@@ -1,9 +1,13 @@
+"""Pydantic models describing the WHERE-filter payload accepted by generated tools."""
+
 from typing import Any, Dict, List, Literal, Optional, Union, cast
 
 from pydantic import BaseModel, Field, RootModel, model_validator
 
 
 class KnnOp(BaseModel):
+    """Vector nearest-neighbour operator: query vector, distance metric, and threshold."""
+
     model_config = {"extra": "forbid"}
 
     query: List[float]
@@ -12,6 +16,8 @@ class KnnOp(BaseModel):
 
 
 class FilterOp(BaseModel):
+    """The comparison, membership, range, null, and KNN operators for one field."""
+
     model_config = {"extra": "forbid"}
 
     eq: Optional[Any] = None  # Equal
@@ -37,6 +43,8 @@ class FilterOp(BaseModel):
 
 
 class LogicalFilter(BaseModel):
+    """AND/OR/NOT combinators over nested :class:`WhereFilter` values."""
+
     model_config = {"extra": "forbid"}
 
     AND: Optional[List["WhereFilter"]] = None
@@ -45,6 +53,8 @@ class LogicalFilter(BaseModel):
 
 
 class WhereFilter(RootModel[Union[LogicalFilter, Dict[str, FilterOp]]]):
+    """A filter that is either a logical combinator or a map of field to operators."""
+
     model_config = {
         "json_schema_extra": {
             "description": (
@@ -57,6 +67,7 @@ class WhereFilter(RootModel[Union[LogicalFilter, Dict[str, FilterOp]]]):
     @model_validator(mode="before")
     @classmethod
     def reject_mixed_logical_and_field(cls, data: Any) -> Any:
+        """Reject an object mixing logical keys with field filters at the same level."""
         # A filter is either logical (AND/OR/NOT) or field filters, never both;
         # mixing would resolve to the logical branch and silently drop the fields.
         if isinstance(data, dict):
@@ -73,6 +84,7 @@ class WhereFilter(RootModel[Union[LogicalFilter, Dict[str, FilterOp]]]):
 
     @model_validator(mode="after")
     def check_reserved_keys(self):
+        """Reject direct field filters that use the reserved AND/OR/NOT names as fields."""
         if isinstance(self.root, dict):
             reserved = {"AND", "OR", "NOT"}
             intersecting = reserved.intersection(self.root.keys())

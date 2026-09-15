@@ -1,3 +1,5 @@
+"""Generator for the per-table ``insert`` tool and its row model."""
+
 from typing import List, Optional, Tuple
 
 from tai42_mcp_dynamic_postgres.gen.builders.base_gen import Chunk, TableGen
@@ -59,9 +61,12 @@ def _strip_optional(annotation: str) -> str:
 
 
 class InsertGen(TableGen):
+    """Emits an ``insert`` tool and row model per writable table."""
+
     writable_only = True
 
     def __init__(self, ignore_columns: Optional[List[str]] = None) -> None:
+        """Configure the generator, excluding ``ignore_columns`` from the insert model."""
         super().__init__(_FUNC_PREFIX, _IMPORTS, _TOOL_TEMPLATE, ignore_columns)
 
     def _return_type_and_doc(self, table_info: TableInfo) -> Tuple[str, str]:
@@ -84,6 +89,7 @@ class InsertGen(TableGen):
         return "List[List[Any]]", doc
 
     def generate_tool(self, table_info: TableInfo) -> Optional[Chunk]:
+        """Build the insert model and tool code for ``table_info``, or None to skip it."""
         insert_columns = self.included(table_info)
         # An all-columns-ignored table has nothing to insert via the tool; skip
         # it rather than emitting an empty, invalid values tuple.

@@ -1,3 +1,5 @@
+"""pgvector distance operators and text-literal rendering."""
+
 from typing import Dict, List
 
 from psycopg import sql

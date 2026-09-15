@@ -1,3 +1,5 @@
+"""The shared FastMCP application and the lifespan that owns the connection pool."""
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 

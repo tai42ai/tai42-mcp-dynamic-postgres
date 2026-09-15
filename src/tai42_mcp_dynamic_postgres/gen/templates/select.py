@@ -1,3 +1,5 @@
+"""Runtime helper backing the generated single-table ``select`` tools."""
+
 from typing import Any, List, Optional, Sequence, Type
 
 from psycopg import sql

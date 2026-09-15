@@ -1,3 +1,5 @@
+"""PostgreSQL connection and pool settings read from ``PG_*`` environment variables."""
+
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -8,6 +10,8 @@ load_dotenv()
 
 
 class PostgresSettings(BaseSettings):
+    """Connection, pool, and generated-tools-directory settings from the ``PG_*`` env vars."""
+
     model_config = {
         "env_prefix": "PG_",
     }
