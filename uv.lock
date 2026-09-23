@@ -1344,19 +1344,19 @@ wheels = [
 
 [[package]]
 name = "tai42-contract"
-version = "12.0.0"
+version = "14.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/31/9c/e279af9bdc854f967815f1f37767f573815414da424f2d01c9b5f5e323f3/tai42_contract-12.0.0.tar.gz", hash = "sha256:4c855a02d79768cb8b44719a3059021cd6f39674afebc4fe8256794147ec3247", size = 256146, upload-time = "2026-09-15T08:36:50.978Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/6a/ea5717a102c5eb01790775d6a949ebae2a0d7afc36f26364b44e9bc8d759/tai42_contract-14.0.0.tar.gz", hash = "sha256:e5d286ac69d9170c85c8765fd207965ac5f6283419af30d41e817a46a39fcf5b", size = 283015, upload-time = "2026-09-23T08:01:24.596Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/8c/ba8185a8b96974add90320c58f030bd63871186f709e7befd7347dab3a68/tai42_contract-12.0.0-py3-none-any.whl", hash = "sha256:cd01e29514e27ff3b720372fe1ad11057e235e1777f597f98bdeb7e1c1769928", size = 319662, upload-time = "2026-09-15T08:36:49.7Z" },
+    { url = "https://files.pythonhosted.org/packages/86/fa/ed4082c263a53087b6ed6bfd73b3d647892002f120f1f7a15059323f2f8b/tai42_contract-14.0.0-py3-none-any.whl", hash = "sha256:d5af5344f1add2e7317fe421b302b95542f468f813c09a95e86f80fa68276d6f", size = 351068, upload-time = "2026-09-23T08:01:22.593Z" },
 ]
 
 [[package]]
 name = "tai42-kit"
-version = "5.0.0"
+version = "6.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1372,9 +1372,9 @@ dependencies = [
     { name = "ruamel-yaml" },
     { name = "tai42-contract" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/2f/98f302f5f3c6d57006b09ee9acb9981e4add997e84599029800c4df9b953/tai42_kit-5.0.0.tar.gz", hash = "sha256:0f364fcefa046a4b90d1b1eef7d222c6b9af5b3eef1dae7d8af9f653f83f94b4", size = 166090, upload-time = "2026-09-15T08:36:55.115Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/19/c48b857fddde9b285de217f876b5de74157bb2addccd7f48414424adbf37/tai42_kit-6.0.1.tar.gz", hash = "sha256:2fc72fd0cdf88f95770c6bbb7b3071727ed430d3e45a2b40fb7e68171487a1dd", size = 175753, upload-time = "2026-09-23T08:49:27.78Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/93/662884a99abffa6401c45f144ce815aa2483763de88dad957cdec2f9045e/tai42_kit-5.0.0-py3-none-any.whl", hash = "sha256:78cc346890045e35d1b3a62c9cc816a9e3297087f39f1f4d09a1c9d5654b1371", size = 200941, upload-time = "2026-09-15T08:36:53.717Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/84/0f23aff0d569c8061a76775473c342d01bbaca2784e7e1678b4faf0aaed5/tai42_kit-6.0.1-py3-none-any.whl", hash = "sha256:707761332fe3d8109dc0581bf8f94d47b89715343512025051fbf3630d4c6646", size = 212223, upload-time = "2026-09-23T08:49:26.556Z" },
 ]
 
 [[package]]
@@ -1417,8 +1417,8 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "tai42-contract", marker = "extra == 'dev'", specifier = ">=12,<13" },
-    { name = "tai42-kit", marker = "extra == 'dev'", specifier = ">=5,<6" },
+    { name = "tai42-contract", marker = "extra == 'dev'", specifier = ">=14,<15" },
+    { name = "tai42-kit", marker = "extra == 'dev'", specifier = ">=6,<7" },
     { name = "testcontainers", extras = ["postgres"], marker = "extra == 'test-integration'", specifier = ">=4.0" },
 ]
 provides-extras = ["dev", "test-integration"]
