@@ -43,8 +43,8 @@ dev = [
     # in-package docs with tai42-kit (scan_env_marker_refs, validate_docs). Each
     # range accepts every sibling minor within the current major. Installed via
     # `uv sync --extra dev` in CI.
-    "tai42-contract>=14,<15",
-    "tai42-kit>=6,<7",
+    "tai42-contract>=15,<16",
+    "tai42-kit>=7,<8",
 ]
 test-integration = [
     "testcontainers[postgres]>=4.0",
