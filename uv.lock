@@ -1344,14 +1344,14 @@ wheels = [
 
 [[package]]
 name = "tai42-contract"
-version = "15.0.0"
+version = "15.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7f/a3/6a34c68865b64b8190bd5090ed52eebc0d9dab053db51097d74c5711f4a9/tai42_contract-15.0.0.tar.gz", hash = "sha256:9b535855576051e484028485105c389172574f2060ceded94792b55590a08ee4", size = 284926, upload-time = "2026-09-23T21:24:37.414Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/6c/0816934bee35e4b6698da5105b8b80c41812dab86eb298be00c2eb693fff/tai42_contract-15.4.1.tar.gz", hash = "sha256:6dacdf98c849e3c81aad037daf628c68cfc308717e495edc7ad4b753d41098d1", size = 298352, upload-time = "2026-10-02T03:53:26.661Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/52/6d7dc628577fdd13244b0a03bab995b05d02fa504f11b8134a0bf104d909/tai42_contract-15.0.0-py3-none-any.whl", hash = "sha256:36e4277ffde1a27d89853d6a83cec30e260676d910308bf370e8af63729f1384", size = 353075, upload-time = "2026-09-23T21:24:35.976Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/1c/cca3b82bb58454e6f5c9266a8c941858878aaba4015106d996f11ba8ac72/tai42_contract-15.4.1-py3-none-any.whl", hash = "sha256:0d85b4dc846a5c1867b78adf83eec2778aa98e69e119335c33fc602fda9b8072", size = 367979, upload-time = "2026-10-02T03:53:25.364Z" },
 ]
 
 [[package]]
