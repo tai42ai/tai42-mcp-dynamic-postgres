@@ -807,6 +807,15 @@ wheels = [
 ]
 
 [[package]]
+name = "prometheus-client"
+version = "0.26.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/52/73/f1334c29c2af4cd9dba6c7817e61b611bd0215e2eb5565c6064a4de18802/prometheus_client-0.26.0.tar.gz", hash = "sha256:04a91bcf94e2cf74a44a1a874d651a2e853ed354b6e822f3b7487751465d5c2b", size = 92910, upload-time = "2026-07-24T19:36:41.893Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/a3/b69efbf4143b5b9859b977770bbbabcc2796b702fa69dc40271e45cd5a56/prometheus_client-0.26.0-py3-none-any.whl", hash = "sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6", size = 64494, upload-time = "2026-07-24T19:36:40.854Z" },
+]
+
+[[package]]
 name = "psycopg"
 version = "3.2.13"
 source = { registry = "https://pypi.org/simple" }
@@ -1344,19 +1353,19 @@ wheels = [
 
 [[package]]
 name = "tai42-contract"
-version = "15.4.1"
+version = "20.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/6c/0816934bee35e4b6698da5105b8b80c41812dab86eb298be00c2eb693fff/tai42_contract-15.4.1.tar.gz", hash = "sha256:6dacdf98c849e3c81aad037daf628c68cfc308717e495edc7ad4b753d41098d1", size = 298352, upload-time = "2026-10-02T03:53:26.661Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/8a/8d31af087eced064b34c7bb9b25310b60b7ed64d3be9f750bdfd9d97b4e7/tai42_contract-20.0.0.tar.gz", hash = "sha256:718e7eb8e4aedfa2c1fdf173b0864b67baddfbc9292762428d6f9323fac9ecce", size = 334542, upload-time = "2026-10-17T22:15:33.844Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/1c/cca3b82bb58454e6f5c9266a8c941858878aaba4015106d996f11ba8ac72/tai42_contract-15.4.1-py3-none-any.whl", hash = "sha256:0d85b4dc846a5c1867b78adf83eec2778aa98e69e119335c33fc602fda9b8072", size = 367979, upload-time = "2026-10-02T03:53:25.364Z" },
+    { url = "https://files.pythonhosted.org/packages/77/51/18f9b89a468746abdddb17f4c1c6f004b2e8167d91408a7ee431d4312c6b/tai42_contract-20.0.0-py3-none-any.whl", hash = "sha256:0022008a0dbf9c7a6f09dd4fe3970233ac844e8044be4b856577810ceb8abf4b", size = 408786, upload-time = "2026-10-17T22:15:32.648Z" },
 ]
 
 [[package]]
 name = "tai42-kit"
-version = "7.0.1"
+version = "11.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1364,17 +1373,20 @@ dependencies = [
     { name = "httpcore" },
     { name = "httpx" },
     { name = "jsonschema" },
+    { name = "jsonschema-specifications" },
     { name = "mcp" },
+    { name = "prometheus-client" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
+    { name = "referencing" },
     { name = "ruamel-yaml" },
     { name = "tai42-contract" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/89/4253e3edd96a8d300bc036763de9bf9866be820446c991a5bcffb5946b0b/tai42_kit-7.0.1.tar.gz", hash = "sha256:7896c87e15c2ad4522f702c3d1a05aa693016420bf829d3fc053977fd3b4d4ad", size = 176036, upload-time = "2026-09-23T22:07:00.029Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/88/345cf0e514db346bb787b725dfbbacfe05b2c4b25c3fe61ae618da70507b/tai42_kit-11.0.0.tar.gz", hash = "sha256:ed7bdb21fc5b8f4f77e88a46066dd05a83a39fb43894676f0b7bb318c979d9d4", size = 352210, upload-time = "2026-10-17T22:15:36.436Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/78/19/465260504bfbbf0169e7ccbbf19ec1682894da5320e20761e4cfe9310f90/tai42_kit-7.0.1-py3-none-any.whl", hash = "sha256:0ff8f26f29ddc2159446a6cbc98f8b1cfcb20da1cf74153ca067123116409043", size = 212603, upload-time = "2026-09-23T22:06:58.695Z" },
+    { url = "https://files.pythonhosted.org/packages/59/89/bc07af2accb648134112e6f5905863b8b7eb3760cb1f66124abc89549902/tai42_kit-11.0.0-py3-none-any.whl", hash = "sha256:86ce1b80863d49fae4b32eb99487182857e9e80837e9dc79b30809dbf6bb975d", size = 427171, upload-time = "2026-10-17T22:15:34.519Z" },
 ]
 
 [[package]]
@@ -1417,8 +1429,8 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "tai42-contract", marker = "extra == 'dev'", specifier = ">=15,<16" },
-    { name = "tai42-kit", marker = "extra == 'dev'", specifier = ">=7,<8" },
+    { name = "tai42-contract", marker = "extra == 'dev'", specifier = ">=20,<21" },
+    { name = "tai42-kit", marker = "extra == 'dev'", specifier = ">=11,<12" },
     { name = "testcontainers", extras = ["postgres"], marker = "extra == 'test-integration'", specifier = ">=4.0" },
 ]
 provides-extras = ["dev", "test-integration"]
