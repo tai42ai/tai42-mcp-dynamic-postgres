@@ -1,8 +1,8 @@
-# Release PRs merge themselves the moment branch protection's required checks
-# pass — the release train has no human step. The PAT (not GITHUB_TOKEN) must
-# both enable auto-merge and author the merge commit: refs written by
-# GITHUB_TOKEN fire no workflows, so a GITHUB_TOKEN merge would strand the tag
-# before its published artifact ever built.
+# Release PRs open as drafts; marking one ready for review arms auto-merge, so the
+# release train merges itself the moment branch protection's required checks pass.
+# The PAT (not GITHUB_TOKEN) must both enable auto-merge and author the merge commit:
+# refs written by GITHUB_TOKEN fire no workflows, so a GITHUB_TOKEN merge would strand
+# the tag before its published artifact ever built.
 #
 # The arming step tolerates a repo where "Allow auto-merge" is currently off: it
 # arms auto-merge when the setting is on and no-ops with a clear log line when it
@@ -13,7 +13,7 @@ name: release-automerge
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ready_for_review]
 
 permissions: {}
 
