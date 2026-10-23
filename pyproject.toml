@@ -41,10 +41,10 @@ dev = [
     # test validates the authored tai-plugin.yml (kind: mcp-server, contract-less)
     # against PluginSpec from tai42-contract, and scans its mcp.env markers and
     # in-package docs with tai42-kit (scan_env_marker_refs, validate_docs). The kit
-    # floor is 11.1, the first kit release built on contract 21; each range accepts
+    # floor is 11.3, the first kit release built on contract 22; each range accepts
     # every later minor within its major. Installed via `uv sync --extra dev` in CI.
-    "tai42-contract>=21,<22",
-    "tai42-kit>=11.1,<12",
+    "tai42-contract>=22,<23",
+    "tai42-kit>=11.3,<12",
 ]
 test-integration = [
     "testcontainers[postgres]>=4.0",
