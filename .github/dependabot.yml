@@ -20,6 +20,12 @@ updates:
         update-types:
           - version-update:semver-major
       - dependency-name: tai42-kit
+      # tai42-kit, which hosts the plugin, requires fastmcp <4, so a new fastmcp
+      # major cannot resolve until the kit admits it; minor and patch releases
+      # still update.
+      - dependency-name: fastmcp
+        update-types:
+          - version-update:semver-major
   # Keep the Docker base image (python:*-slim) current for security fixes.
   - package-ecosystem: docker
     directory: /
