@@ -37,8 +37,8 @@ what changed. No history notes and no ticket references in comments.
 ## Rules
 
 - Release notes are generated onto the GitHub Release from commit messages;
-  release-please is configured with `skip-changelog`, so `CHANGELOG.md` stays the
-  empty stub.
+  release-please is configured with `skip-changelog`, so it does not write
+  `CHANGELOG.md`.
 - Loud errors: a failure is fatal. No silent fallbacks, no `|| true`, no
   swallowed exceptions, no compatibility shims.
 - The workflows under `.github/workflows/` are the source of truth for commands;
