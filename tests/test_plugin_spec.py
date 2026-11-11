@@ -47,10 +47,15 @@ def test_spec_version_matches_the_package_version() -> None:
 
 
 def test_mcp_transport_launches_the_console_script() -> None:
+    # The platform runs an mcp-server package from its own environment, which
+    # exposes only the console scripts the package declares, so the command is
+    # that script itself.
     mcp = _spec().provides[0].mcp
     assert mcp is not None
-    assert mcp.command == "uvx"
-    assert mcp.args == ["tai42-mcp-dynamic-postgres"]
+    console_scripts = _pyproject()["project"]["entry-points"]["console_scripts"]
+    assert mcp.command in console_scripts
+    assert mcp.command == "tai42-mcp-dynamic-postgres"
+    assert mcp.args == []
 
 
 def test_every_mcp_env_value_is_an_env_marker() -> None:
