@@ -31,9 +31,7 @@ provides:
       Schema-driven generator for safe, scoped PostgreSQL DML tools in FastMCP
       agent systems
     mcp:
-      command: uvx
-      args:
-        - tai42-mcp-dynamic-postgres
+      command: tai42-mcp-dynamic-postgres
       env:
         PG_HOST: '!ENV ${PG_HOST:localhost}'
         PG_PORT: '!ENV ${PG_PORT:5432}'
